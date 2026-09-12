@@ -1,0 +1,585 @@
+@import "tailwindcss" source(none);
+
+/* Scan only real source. Auto-detection would otherwise read the prose in
+   the project notes and emit utilities for the very things they ban. */
+@source "../app";
+@source "../components";
+@source "../content";
+
+/* ==========================================================================
+   Design tokens — dark only. No light theme, no `.dark` class, no media fork.
+
+   Black and cream. Abdllah asked for this directly — "theme i want it like
+   black and creamy" — which reverses the cool cyan scheme the rest of the
+   build was designed around, and reverses part of a documented project rule.
+   That rule exists for a real reason, so here is exactly what changed and what
+   did not:
+
+     - The rule bans anything that reads as sparkwebdigital.ca, his own studio
+       site, because the v2 build reproduced it and he rejected it as
+       "repetitive to my own website". SparkWeb's signature is four things
+       together: #11100d warm brown-black ink, #f0eae0 bone, #eb471e ember
+       orange, and Fraunces as the display face.
+     - This palette takes one of those four and refuses the other three. The
+       ground is #0a0a09, a neutral black, not a brown one. There is no ember;
+       the accent is a desaturated sand that never crosses into orange. The
+       display face is still Archivo, a grotesk. Nothing here is a serif.
+     - So: cream on black, yes. SparkWeb, no.
+
+   umarzaman.ca is #0f0f0f + emerald. Same structure, different identity, and
+   still true after the repaint.
+
+   Hierarchy is luminance and warmth, not hue. --fg is the brightest thing on
+   the page and --accent sits just under it, warmer — so a link reads as a
+   link by temperature rather than by turning a different colour entirely.
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* -- surfaces ---------------------------------------------------------- */
+  --bg: #0a0a09;            /* page ground — neutral black, not brown */
+  --surface: #141412;       /* cards */
+  --surface-2: #1d1b18;     /* card hover, nested panels */
+  --line: #292724;          /* hairlines and card borders */
+  --line-bright: #3e3b36;   /* border on hover / focus */
+
+  /* -- type -------------------------------------------------------------- */
+  --fg: #f0eade;            /* primary text — cream, never pure #fff */
+  --fg-dim: #ada698;        /* secondary text, body copy in cards */
+  --fg-faint: #8a8376;      /* metadata only — see the contrast note below */
+
+  /* -- accent ------------------------------------------------------------ */
+  --accent: #e7d3a3;        /* section titles, links, active nav */
+  --accent-bright: #f4e6bf; /* hover */
+  --accent-deep: #544c3c;   /* borders, tag outlines */
+  --accent-wash: #1d1b15;   /* tag background */
+
+  /* -- status ------------------------------------------------------------ */
+  --ok: #9fc08a;            /* "Completed", shipped */
+  --pending: #d9b263;       /* "In Progress" */
+
+  /* -- layout ------------------------------------------------------------ */
+  --shell: 1120px;
+  --gutter: clamp(20px, 5vw, 48px);
+  --nav-h: 60px;
+  --measure: 68ch;
+  --radius: 12px;
+  --radius-sm: 8px;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/*  Contrast. First column is against --bg (#0a0a09), second against
+    --surface (#141412) — cards sit on the lighter of the two, so the second
+    number is the one that has to clear the bar. Recomputed in full for the
+    black-and-cream repaint; every token still clears AA for normal text.
+
+      --fg          16.4 / 15.5   anything
+      --fg-dim       8.1 /  7.7   anything
+      --fg-faint     5.2 /  5.0   anything
+      --accent      13.3 / 12.6   links, section titles, UI at any size
+      --ok           9.7 /  9.2   status text
+      --pending      9.8 /  9.3   status text
+      --accent-bright on --accent-wash (#1d1b15): 13.9   tag text
+      --bg on --accent (the "View Projects" button): 13.3
+
+    Two of those numbers matter more than the rest.
+
+    --accent is DIMMER than --fg, which inverts the usual arrangement. That is
+    deliberate: on a cream page the brightest thing has to be the body copy, or
+    every link and section title shouts. The accent separates itself by warmth
+    instead — #e7d3a3 against #f0eade is a clear temperature step at the same
+    kind of luminance. If a future change makes the accent brighter than --fg,
+    the page will start reading as a wall of highlights.
+
+    --fg-faint was #5d6b7d under the cyan palette until the phase 7 audit found
+    all 27 of its uses were 11-14px regular weight carrying real content —
+    employment dates, the certification issuer line, the project role chips,
+    the contact tile labels. None qualified as large text, so the
+    "decorative only" exemption never applied and the token was failing AA 27
+    times. Its cream replacement is specced to clear 4.5:1 on both grounds from
+    the start. If a genuinely decorative grey is ever needed, add a separate
+    token rather than darkening this one.                                      */
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-bright: var(--line-bright);
+  --color-fg: var(--fg);
+  --color-fg-dim: var(--fg-dim);
+  --color-fg-faint: var(--fg-faint);
+  --color-accent: var(--accent);
+  --color-accent-bright: var(--accent-bright);
+  --color-accent-deep: var(--accent-deep);
+  --color-accent-wash: var(--accent-wash);
+  --color-ok: var(--ok);
+  --color-pending: var(--pending);
+
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  --radius-card: var(--radius);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+/* Element resets live in @layer base so every Tailwind utility outranks them.
+   Unlayered, `a { color: inherit }` silently beat `text-accent` on every link
+   on the site — the active nav item rendered plain white. */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--nav-h) + 24px);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  * {
+    scrollbar-color: var(--line-bright) var(--bg);
+    scrollbar-width: thin;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--line-bright);
+    border: 3px solid var(--bg);
+    border-radius: 99px;
+  }
+}
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+/* The shared component classes sit in @layer components, one rung below the
+   utilities, so `className="kicker text-fg"` behaves the way it reads. */
+@layer components {
+  .shell {
+    width: 100%;
+    max-width: var(--shell);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  /* Big grotesk voice: the name, section titles, card headings. */
+  .display {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  /* Mono metadata: dates, labels, kickers. Carries digits well. */
+  .mono {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .kicker {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+  }
+
+  .measure {
+    max-width: var(--measure);
+  }
+
+  /* The card. One shape, reused everywhere — experience, projects, skills.
+     Solid background: no backdrop filter, so scrolling never re-rasterises.
+     ("backdrop filter" is written with a space on purpose, here and in
+     Nav.tsx and ui/Card.tsx. Tailwind v4 scans raw file text for class names,
+     comments included, so the hyphenated spelling of that property was being
+     read as a utility name and emitted 569 bytes of dead CSS into the
+     bundle — a rule banning the effect was the only thing shipping it.) */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    transition:
+      border-color 180ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .card:hover {
+    border-color: var(--accent-deep);
+    transform: translateY(-2px);
+  }
+
+  /* Tech tag. Small, mono, low-key — a label, not a decoration. */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    padding: 0.375rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background: var(--accent-wash);
+    border: 1px solid var(--accent-deep);
+    color: var(--accent-bright);
+    white-space: nowrap;
+  }
+
+  /* Achievement bullet — a drawn caret, not an emoji. */
+  .bullets li {
+    position: relative;
+    padding-left: 1.125rem;
+  }
+  .bullets li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 5px;
+    height: 5px;
+    border-right: 1.5px solid var(--accent);
+    border-bottom: 1.5px solid var(--accent);
+    transform: rotate(-45deg);
+  }
+
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 1px;
+    transition:
+      background-size 220ms var(--ease),
+      color 160ms var(--ease);
+  }
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  /* Pointer target expander.
+
+     The footer and hero link rows are 14px text: an 18px-tall, 36px-wide box
+     for "Email". Padding them out to 44px is the obvious fix and the wrong
+     one — .link-underline paints its rule at `background-position: 0 100%`,
+     so a taller box drops the underline 13px below the baseline it belongs
+     to. This stretches a transparent hit area around the link instead,
+     centred on it, and moves no painted pixel.
+
+     Only safe where the targets do not sit close enough for the expanded
+     areas to collide. Both rows it is used on are single-line at 375px and
+     up, with a 20px gap; a vertical menu needs real padding instead — see
+     the mobile panel in Nav.tsx. */
+  .tap {
+    position: relative;
+  }
+  .tap::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+
+  /* Native <details> disclosure — the project cards' "Details" panel.
+     Zero JS: it is keyboard accessible and works before hydration and with
+     scripting off, which is the whole reason it is not a React toggle. */
+  .disclosure > summary {
+    list-style: none;
+  }
+  /* Safari/Chrome draw their own triangle on top of ours without this. */
+  .disclosure > summary::-webkit-details-marker {
+    display: none;
+  }
+  .disclosure[open] > summary {
+    color: var(--accent);
+  }
+  .disclosure-chevron {
+    display: inline-block;
+    margin-right: 0.5rem;
+    font-size: 0.6875rem;
+    transition: transform 180ms var(--ease);
+  }
+  .disclosure[open] .disclosure-chevron {
+    transform: rotate(90deg);
+  }
+}
+
+/* ==========================================================================
+   Motion — transform and opacity only. Nothing here repaints on scroll.
+   ========================================================================== */
+/* Layered, like everything else in this file. `.rise` and `.reveal` only set
+   animation and transition, so nothing competes with them today — but an
+   unlayered rule here would outrank every Tailwind utility the moment one
+   did, which is exactly the trap that cost a phase in `a { color: inherit }`.
+   The reduced-motion overrides sit last inside the layer, so they beat the
+   `.card:hover` lift declared earlier in the same layer. */
+@layer components {
+
+  /* Reveal targets are VISIBLE by default. The hidden state is gated behind
+     [data-reveal-ready], which phase 7's mounter stamps on <html> before first
+     paint. Without JS — or between phases, before the mounter exists — nothing
+     is ever stranded at opacity 0. */
+  .reveal {
+    transition:
+      opacity 560ms var(--ease),
+      transform 560ms var(--ease);
+  }
+  [data-reveal-ready] .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  [data-reveal-ready] .reveal.in {
+    opacity: 1;
+    transform: none;
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .rise {
+    animation: rise 520ms var(--ease) both;
+  }
+
+  /* Terminal caret blink. Used by the typewriter's cover edge below. */
+  @keyframes caret {
+    0%,
+    49% {
+      opacity: 1;
+    }
+    50%,
+    100% {
+      opacity: 0;
+    }
+  }
+  /* Typewriter role line, under the name in the hero.
+
+     Each role types itself out one character at a time, holds, deletes itself
+     and hands over to the next. No timer, no state, no third "use client"
+     component: a JS rotator would re-render, several times a second, the one
+     element guaranteed to be on screen the whole time the page is open.
+
+     HOW IT WORKS, because it is not the usual recipe. Every CSS typewriter on
+     the internet animates `width` with `steps()`, and this project bans
+     animating width — it is a layout property, so each of those steps is a
+     reflow of everything after it on the line. What moves here instead is an
+     opaque cover the exact size of the role, painted in --bg and laid over it.
+     At rest it hides the text completely; `transform: translateX()` slides it
+     off to the right in `steps(--chars)`, uncovering one character per step,
+     and slides it back to delete. Transform only. Nothing reflows, and the
+     cover composites on the GPU like every other animation in this file.
+
+     --chars is the role's character count, set inline per span in Hero.tsx.
+     It is the number of steps, and it lands one character per step only
+     because this line is set in DM Mono — every glyph is the same width. Set
+     this in a proportional face and the steps drift out of phase with the
+     letters. The `var(--chars, 16)` fallback keeps the sweep running (as a
+     smooth slide rather than a stepped one) if the variable ever goes missing,
+     which beats the alternative: an invalid timing function would take the
+     whole shorthand down and leave the line permanently covered.
+
+     grid-area 1/1 stacks all three roles in one cell, so the box is as wide as
+     the longest of them and nothing after it shifts as the text changes.
+     justify-self: start keeps each span its own natural width, which is what
+     the cover measures itself against.
+
+     12s is 3 roles x 4s, and the keyframe stops are tuned to that: 1s typing,
+     2s held, 1s deleting. A fourth role in site.roles means retuning both
+     keyframe blocks and ROLE_SECONDS in Hero.tsx. */
+  .type-cycle {
+    display: inline-grid;
+  }
+  .type-cycle > * {
+    grid-area: 1 / 1;
+    justify-self: start;
+    position: relative;
+    /* Hidden is the base state, and the fill mode is `none` rather than the
+       `both` every other animation in this file uses. That is not a slip.
+
+       With `both`, an animation that has not started yet paints its 0%
+       keyframe, and 0% here is the visible one. So for the first four seconds
+       of a page load role two was filling forwards into view, and role three
+       for the first eight - each of them a cover-sized black rectangle laid
+       over role one, which was typing away underneath and never seen. The
+       symptom was an empty line under the name.
+
+       `none` means an animation in its delay phase contributes nothing and
+       the base style below is what shows: opacity 0, correctly out of the
+       way. Nothing is stranded there, because these animations are infinite
+       and so never reach an after-phase. */
+    opacity: 0;
+    animation: type-show 12s linear infinite;
+  }
+  @keyframes type-show {
+    0%,
+    33.33% {
+      opacity: 1;
+    }
+    33.34%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .type-cover {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    pointer-events: none;
+    animation-name: type-sweep;
+    animation-duration: 12s;
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+    animation-timing-function: steps(var(--chars, 16));
+  }
+  /* The cover's left edge is the caret, so it sits at the typing position for
+     free and needs no separate animation to travel. It only has to blink. */
+  .type-cover::before {
+    content: "";
+    position: absolute;
+    left: -1px;
+    top: 0.1em;
+    bottom: 0.1em;
+    width: 2px;
+    background: var(--accent);
+    animation: caret 1.06s step-end infinite;
+  }
+  @keyframes type-sweep {
+    0% {
+      transform: translateX(0);
+    }
+    8.333% {
+      transform: translateX(100%);
+    }
+    25% {
+      transform: translateX(100%);
+    }
+    33.333% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  /* Screenshot cycler on a project card. Same mechanism, same reasons.
+
+     Seven frames, 2.5s each, so a 17.5s loop; the delay is set inline per
+     frame from the gallery index. Frames are stacked in a grid cell rather
+     than absolutely positioned, so the card's height still comes from the
+     images themselves and there is no aspect-ratio box to keep in sync.
+
+     Opacity only. The card does not resize, nothing reflows, and there is no
+     scroll or pointer listener anywhere near it. */
+  .photo-cycle {
+    display: grid;
+  }
+  .photo-cycle > * {
+    grid-area: 1 / 1;
+    animation: photo-cycle 17.5s linear infinite both;
+  }
+  @keyframes photo-cycle {
+    0% {
+      opacity: 0;
+    }
+    2%,
+    14.29% {
+      opacity: 1;
+    }
+    16.29%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+    /* Never leave content stranded at opacity 0 when the observer is skipped. */
+    [data-reveal-ready] .reveal {
+      opacity: 1;
+      transform: none;
+    }
+    .card:hover {
+      transform: none;
+    }
+    /* Both cyclers stack their frames and show one at a time. The blanket
+       duration override above lands every frame on its final keyframe, which
+       is opacity 0 for all of them, so the hero role line and the project
+       screenshot would both go blank. Pin frame one instead.
+
+       The typewriter needs one more pin than the photo cycler: killing the
+       sweep leaves the cover at its declared transform, which is none — the
+       covered state. Push it fully off so the role reads as finished typing,
+       and hold the caret steady after it rather than letting the blink land
+       on its own 100% keyframe, which is also opacity 0. */
+    .type-cycle > *,
+    .photo-cycle > * {
+      animation: none !important;
+      opacity: 0;
+    }
+    .type-cycle > :first-child,
+    .photo-cycle > :first-child {
+      opacity: 1;
+    }
+    .type-cover {
+      animation: none !important;
+      transform: translateX(100%);
+    }
+    .type-cover::before {
+      animation: none !important;
+      opacity: 1;
+    }
+  }
+}

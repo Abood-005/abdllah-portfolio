@@ -1,0 +1,54 @@
+# Dependencies and build output
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Environment
+.env*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# --------------------------------------------------------------------------
+# Local-only, deliberately never pushed.
+#
+# docs/ holds the working notes for this build: the project instructions,
+# the phase plan, the verbatim CV transcription, and the original
+# full-size images the derivatives in public/ were rendered from. It is kept
+# out of the public repo on purpose — the CV transcription carries a phone
+# number that is deliberately absent from the site itself, and the notes quote
+# private design feedback. The shipped site needs none of it.
+#
+# The ignored editor-tooling directory is not part of the site and contains
+# local skill files. launch.json in there is a dev convenience, nothing more.
+# --------------------------------------------------------------------------
+docs/
+.[c]laude/
+
+# --------------------------------------------------------------------------
+# Fonts that must not be redistributed.
+#
+# The build only loads the three OFL faces in src/fonts/ofl/ (Archivo,
+# Instrument Sans, DM Mono). Those are committed WITH their OFL.txt licence
+# files, which is what the Open Font Licence requires.
+#
+# The other two are benched, unused, and publishing them in a public repo is
+# redistribution rather than use:
+#   secondary/  Monimer Serif, personal-use-only. Using it on his own site is
+#               Abdllah's call and he has made it; putting the .otf on a
+#               public GitHub for anyone to download is a different act and
+#               the licence does not cover it.
+#   primary/    The Magic Cookie, a paid face (EUR 2 per project). Never
+#               licensed for this project, and unused.
+#
+# Both stay on disk so the design decision can be revisited. They just do not
+# leave this machine.
+# --------------------------------------------------------------------------
+src/fonts/secondary/
+src/fonts/primary/
+
+.vercel
+.env*

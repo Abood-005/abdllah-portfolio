@@ -23,7 +23,8 @@
      - This palette takes one of those four and refuses the other three. The
        ground is #0a0a09, a neutral black, not a brown one. There is no ember;
        the accent is a desaturated sand that never crosses into orange. The
-       display face is still Archivo, a grotesk. Nothing here is a serif.
+       display face is Anybody, an expressive variable grotesk. Nothing here
+       is a serif.
      - So: cream on black, yes. SparkWeb, no.
 
    umarzaman.ca is #0f0f0f + emerald. Same structure, different identity, and
@@ -38,15 +39,15 @@
   color-scheme: dark;
 
   /* -- surfaces ---------------------------------------------------------- */
-  --bg: #0a0a09;            /* page ground — neutral black, not brown */
-  --surface: #141412;       /* cards */
-  --surface-2: #1d1b18;     /* card hover, nested panels */
-  --line: #292724;          /* hairlines and card borders */
-  --line-bright: #3e3b36;   /* border on hover / focus */
+  --bg: #080807;            /* page ground — neutral black, not brown */
+  --surface: #141310;       /* primary panels */
+  --surface-2: #1d1b18;     /* interactive and nested panels */
+  --line: #302d27;          /* hairlines and structural grid */
+  --line-bright: #48433a;   /* border on hover / focus */
 
   /* -- type -------------------------------------------------------------- */
   --fg: #f0eade;            /* primary text — cream, never pure #fff */
-  --fg-dim: #ada698;        /* secondary text, body copy in cards */
+  --fg-dim: #ada698;        /* secondary text and body copy */
   --fg-faint: #8a8376;      /* metadata only — see the contrast note below */
 
   /* -- accent ------------------------------------------------------------ */
@@ -54,6 +55,8 @@
   --accent-bright: #f4e6bf; /* hover */
   --accent-deep: #544c3c;   /* borders, tag outlines */
   --accent-wash: #1d1b15;   /* tag background */
+  --signal: #6f83ff;        /* live connections and opportunity status */
+  --signal-wash: #171a2c;   /* signal surface */
 
   /* -- status ------------------------------------------------------------ */
   --ok: #9fc08a;            /* "Completed", shipped */
@@ -62,25 +65,22 @@
   /* -- layout ------------------------------------------------------------ */
   --shell: 1120px;
   --gutter: clamp(20px, 5vw, 48px);
-  --nav-h: 60px;
-  --measure: 68ch;
-  --radius: 12px;
-  --radius-sm: 8px;
-
+  --nav-h: 76px;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-/*  Contrast. First column is against --bg (#0a0a09), second against
-    --surface (#141412) — cards sit on the lighter of the two, so the second
+/*  Contrast. First column is against --bg (#080807), second against
+    --surface (#141310) — panels sit on the lighter of the two, so the second
     number is the one that has to clear the bar. Recomputed in full for the
     black-and-cream repaint; every token still clears AA for normal text.
 
-      --fg          16.4 / 15.5   anything
-      --fg-dim       8.1 /  7.7   anything
-      --fg-faint     5.2 /  5.0   anything
-      --accent      13.3 / 12.6   links, section titles, UI at any size
-      --ok           9.7 /  9.2   status text
-      --pending      9.8 /  9.3   status text
+      --fg          16.7 / 15.5   anything
+      --fg-dim       8.3 /  7.7   anything
+      --fg-faint     5.3 /  4.9   anything
+      --accent      13.6 / 12.6   links, section titles, UI at any size
+      --signal       6.1 /  5.6   sequence labels and live status
+      --ok           9.9 /  9.2   status text
+      --pending     10.0 /  9.3   status text
       --accent-bright on --accent-wash (#1d1b15): 13.9   tag text
       --bg on --accent (the "View Projects" button): 13.3
 
@@ -93,10 +93,10 @@
     kind of luminance. If a future change makes the accent brighter than --fg,
     the page will start reading as a wall of highlights.
 
-    --fg-faint was #5d6b7d under the cyan palette until the phase 7 audit found
+    --fg-faint was #5d6b7d under the cyan palette until the contrast audit found
     all 27 of its uses were 11-14px regular weight carrying real content —
     employment dates, the certification issuer line, the project role chips,
-    the contact tile labels. None qualified as large text, so the
+    and contact labels. None qualified as large text, so the
     "decorative only" exemption never applied and the token was failing AA 27
     times. Its cream replacement is specced to clear 4.5:1 on both grounds from
     the start. If a genuinely decorative grey is ever needed, add a separate
@@ -115,14 +115,14 @@
   --color-accent-bright: var(--accent-bright);
   --color-accent-deep: var(--accent-deep);
   --color-accent-wash: var(--accent-wash);
+  --color-signal: var(--signal);
+  --color-signal-wash: var(--signal-wash);
   --color-ok: var(--ok);
   --color-pending: var(--pending);
 
   --font-display: var(--font-display);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
 
-  --radius-card: var(--radius);
 }
 
 /* ==========================================================================
@@ -158,6 +158,10 @@
     outline: 2px solid var(--accent);
     outline-offset: 3px;
     border-radius: 4px;
+  }
+
+  main:focus {
+    outline: none;
   }
 
   a {
@@ -197,83 +201,1639 @@
     padding-inline: var(--gutter);
   }
 
-  /* Big grotesk voice: the name, section titles, card headings. */
+  /* One expressive voice for names and headings; body copy stays restrained. */
   .display {
     font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-variation-settings: "wdth" 108;
     font-weight: 700;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
+    line-height: 1;
+    letter-spacing: -0.015em;
   }
 
-  /* Mono metadata: dates, labels, kickers. Carries digits well. */
+  /* Metadata uses the reading face, not a decorative terminal voice. */
   .mono {
-    font-family: var(--font-mono), ui-monospace, monospace;
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.025em;
     font-variant-numeric: tabular-nums;
   }
 
   .kicker {
-    font-family: var(--font-mono), ui-monospace, monospace;
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
     font-size: 0.6875rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--fg-faint);
   }
 
-  .measure {
-    max-width: var(--measure);
+  /* Floating recruiter navigation. It is deliberately solid rather than
+     translucent: the frame is the visual device, not a blur effect. */
+  .nav-frame {
+    min-height: 52px;
+    padding: 0.375rem 0.375rem 0.375rem 1rem;
+    border: 1px solid var(--line-bright);
+    border-radius: 10px;
+    background: #0f0f0d;
+    box-shadow: 0 10px 34px rgb(0 0 0 / 0.28);
   }
 
-  /* The card. One shape, reused everywhere — experience, projects, skills.
-     Solid background: no backdrop filter, so scrolling never re-rasterises.
-     ("backdrop filter" is written with a space on purpose, here and in
-     Nav.tsx and ui/Card.tsx. Tailwind v4 scans raw file text for class names,
-     comments included, so the hyphenated spelling of that property was being
-     read as a utility name and emitted 569 bytes of dead CSS into the
-     bundle — a rule banning the effect was the only thing shipping it.) */
-  .card {
-    background: var(--surface);
+  .nav-booking {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    padding-inline: 0.875rem;
+    border-radius: 6px;
+    background: var(--fg);
+    color: var(--bg);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    transition: background-color 160ms var(--ease);
+  }
+  .nav-booking:hover {
+    background: var(--accent-bright);
+  }
+
+  /* Phase 1: the identity and systems canvas. The grid is structural: its
+     columns align the name, description, facts, and capability map. */
+  .hero-stage {
+    position: relative;
+    isolation: isolate;
+    min-height: clamp(700px, calc(100svh - var(--nav-h) - 12px), 900px);
+    overflow: hidden;
     border: 1px solid var(--line);
-    border-radius: var(--radius);
-    transition:
-      border-color 180ms var(--ease),
-      transform 180ms var(--ease);
+    background: var(--bg);
   }
-  .card:hover {
-    border-color: var(--accent-deep);
-    transform: translateY(-2px);
+  .hero-stage::before {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+    background-size: calc(100% / 6) 100%, 100% 76px;
+    content: "";
+    opacity: 0.46;
+    pointer-events: none;
   }
 
-  /* Tech tag. Small, mono, low-key — a label, not a decoration. */
-  .tag {
+  .hero-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 54px;
+    padding: 0.75rem clamp(1.25rem, 3vw, 2rem);
+    border-bottom: 1px solid var(--line);
+    background: rgb(10 10 9 / 0.88);
+  }
+  .hero-availability {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+  .hero-availability-dot {
+    width: 7px;
+    height: 7px;
+    flex: none;
+    border-radius: 999px;
+    background: var(--signal);
+    box-shadow: 0 0 0 5px var(--signal-wash);
+  }
+
+  .hero-title-block {
+    position: relative;
+    padding: clamp(2.25rem, 4vw, 3.25rem) clamp(1.25rem, 3vw, 2rem)
+      clamp(1.75rem, 3vw, 2.5rem);
+  }
+  .hero-name {
+    width: min-content;
+    font-variation-settings: "wdth" 112;
+    font-size: clamp(4.5rem, 11.7vw, 9.25rem);
+    font-weight: 780;
+    line-height: 0.8;
+    letter-spacing: -0.04em;
+  }
+  .hero-name span {
+    display: block;
+  }
+  .hero-name span:last-child {
+    margin-left: clamp(1.5rem, 10vw, 7rem);
+    font-weight: 420;
+  }
+  .hero-discipline {
+    position: absolute;
+    right: clamp(1.25rem, 3vw, 2rem);
+    bottom: clamp(1.75rem, 3vw, 2.5rem);
+    max-width: 13ch;
+    color: var(--fg-dim);
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-variation-settings: "wdth" 105;
+    font-size: clamp(1.15rem, 2.1vw, 1.55rem);
+    font-weight: 550;
+    line-height: 1.08;
+    text-align: right;
+  }
+
+  .hero-lower {
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    border-top: 1px solid var(--line);
+  }
+  .hero-intro {
+    display: flex;
+    min-height: 360px;
+    flex-direction: column;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    background: rgb(10 10 9 / 0.78);
+  }
+  .hero-summary {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: clamp(1rem, 2vw, 1.5rem);
+  }
+  .hero-portrait-frame {
+    position: relative;
+    width: clamp(5rem, 9vw, 7rem);
+    padding: 4px;
+    border: 1px solid var(--line-bright);
+    background: var(--bg);
+  }
+  .hero-portrait-frame::after {
+    position: absolute;
+    right: -1px;
+    bottom: -1px;
+    width: 28%;
+    height: 3px;
+    background: var(--signal);
+    content: "";
+  }
+  .hero-portrait {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    filter: saturate(0.86) contrast(1.03);
+  }
+  .hero-blurb {
+    max-width: 47ch;
+    color: var(--fg-dim);
+    font-size: clamp(1rem, 1.45vw, 1.125rem);
+    line-height: 1.62;
+  }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+  .hero-action-primary,
+  .hero-action-secondary {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding-inline: 1.125rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 650;
+    transition:
+      border-color 160ms var(--ease),
+      background-color 160ms var(--ease),
+      color 160ms var(--ease);
+  }
+  .hero-action-primary {
+    background: var(--fg);
+    color: var(--bg);
+  }
+  .hero-action-primary:hover {
+    background: var(--accent-bright);
+  }
+  .hero-action-secondary {
+    border: 1px solid var(--line-bright);
+    color: var(--fg);
+  }
+  .hero-action-secondary:hover {
+    border-color: var(--accent-deep);
+    background: var(--accent-wash);
+    color: var(--accent-bright);
+  }
+
+  .hero-facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: auto;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
+  }
+  .hero-facts dt {
+    color: var(--fg-faint);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.625rem;
+  }
+  .hero-facts dd {
+    margin-top: 0.35rem;
+    color: var(--fg);
+    font-size: 0.8125rem;
+    line-height: 1.35;
+  }
+
+  .system-panel {
+    min-height: 360px;
+    border-left: 1px solid var(--line);
+    background: rgb(20 19 16 / 0.86);
+  }
+  .system-profile {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .system-status {
     display: inline-flex;
     align-items: center;
-    font-family: var(--font-mono), ui-monospace, monospace;
-    font-size: 0.6875rem;
-    line-height: 1;
-    letter-spacing: 0.02em;
-    padding: 0.375rem 0.5rem;
-    border-radius: var(--radius-sm);
-    background: var(--accent-wash);
-    border: 1px solid var(--accent-deep);
-    color: var(--accent-bright);
-    white-space: nowrap;
+    gap: 0.45rem;
+    color: var(--fg-dim);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.625rem;
+  }
+  .system-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--signal);
+  }
+  .system-canvas {
+    padding: 0.375rem 1rem 0;
+  }
+  .system-connections {
+    fill: none;
+    stroke: var(--line-bright);
+    stroke-width: 1;
+  }
+  .system-route {
+    stroke: var(--signal);
+    stroke-dasharray: 5 7;
+    animation: system-route 10s linear infinite;
+  }
+  .system-junctions {
+    fill: var(--accent-deep);
+  }
+  .system-junction-live {
+    fill: var(--signal);
+  }
+  .system-nodes rect {
+    fill: var(--bg);
+    stroke: var(--line-bright);
+    stroke-width: 1;
+  }
+  .system-nodes text {
+    fill: var(--fg-dim);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: 11px;
+  }
+  .system-mobile-grid {
+    display: none;
+  }
+  .system-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--line);
+    color: var(--fg-faint);
+    font-size: 0.625rem;
   }
 
-  /* Achievement bullet — a drawn caret, not an emoji. */
-  .bullets li {
-    position: relative;
-    padding-left: 1.125rem;
+  @media (max-width: 860px) {
+    .hero-stage {
+      min-height: auto;
+    }
+    .hero-lower {
+      grid-template-columns: 1fr;
+    }
+    .system-panel {
+      border-top: 1px solid var(--line);
+      border-left: 0;
+    }
   }
-  .bullets li::before {
-    content: "";
+
+  @media (max-width: 600px) {
+    .nav-frame {
+      padding-left: 0.875rem;
+    }
+    .nav-booking {
+      padding-inline: 0.75rem;
+      font-size: 0.75rem;
+    }
+    .hero-stage::before {
+      background-size: calc(100% / 3) 100%, 100% 64px;
+    }
+    .hero-topline {
+      align-items: flex-start;
+      min-height: 62px;
+    }
+    .hero-availability {
+      max-width: 24ch;
+      line-height: 1.35;
+    }
+    .hero-title-block {
+      padding-top: 3.25rem;
+      padding-bottom: 2.5rem;
+    }
+    .hero-name {
+      font-size: clamp(3.9rem, 20.5vw, 5.25rem);
+      line-height: 0.8;
+    }
+    .hero-name span:last-child {
+      margin-left: 0.65em;
+    }
+    .hero-discipline {
+      position: static;
+      max-width: none;
+      margin-top: 2rem;
+      font-size: 1.125rem;
+      text-align: left;
+    }
+    .hero-intro {
+      min-height: 410px;
+      padding: 1.25rem;
+    }
+    .hero-summary {
+      grid-template-columns: 1fr;
+    }
+    .hero-portrait-frame {
+      width: 6.25rem;
+    }
+    .hero-actions {
+      align-items: stretch;
+      flex-direction: column;
+    }
+    .hero-facts {
+      gap: 0.625rem;
+    }
+    .hero-facts dd {
+      font-size: 0.75rem;
+    }
+    .system-profile {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    .system-status {
+      justify-self: start;
+    }
+    .system-canvas {
+      display: none;
+    }
+    .system-mobile-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      padding: 1px;
+      background: var(--line);
+    }
+    .system-mobile-grid li {
+      min-height: 64px;
+      padding: 1rem;
+      background: var(--bg);
+      color: var(--fg-dim);
+      font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.6875rem;
+    }
+  }
+
+  /* Phase 2: one production project presented as an engineering dossier.
+     The page scroll is the gallery control; there is no automatic carousel. */
+  .case-section {
+    scroll-margin-top: calc(var(--nav-h) + 24px);
+    padding-top: clamp(4rem, 8vw, 7rem);
+    border-top: 1px solid var(--line);
+  }
+  .case-section-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(16rem, 0.75fr);
+    align-items: end;
+    gap: 2rem;
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+  .case-section-heading > p {
+    max-width: 38ch;
+    justify-self: end;
+    color: var(--fg-dim);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  .case-section-title {
+    font-variation-settings: "wdth" 112;
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 460;
+    letter-spacing: -0.035em;
+  }
+
+  .case-study {
+    margin-bottom: clamp(4rem, 8vw, 7rem);
+    border: 1px solid var(--line);
+    background: var(--bg);
+  }
+  .case-cover {
+    position: relative;
+    isolation: isolate;
+  }
+  .case-cover::before {
     position: absolute;
+    z-index: -1;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+    background-size: 25% 100%, 100% 76px;
+    content: "";
+    opacity: 0.34;
+    pointer-events: none;
+  }
+  .case-meta {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem clamp(1.25rem, 3vw, 2rem);
+    border-bottom: 1px solid var(--line);
+    color: var(--fg-faint);
+    font-size: 0.6875rem;
+  }
+  .case-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--ok);
+  }
+  .case-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+  .case-title-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
+    align-items: end;
+    gap: clamp(2rem, 5vw, 4rem);
+    min-height: 360px;
+    padding: clamp(2.5rem, 6vw, 5rem) clamp(1.25rem, 3vw, 2rem);
+  }
+  .case-title {
+    max-width: 8ch;
+    font-variation-settings: "wdth" 102;
+    font-size: clamp(4rem, 9.8vw, 7.25rem);
+    font-weight: 720;
+    line-height: 0.86;
+    letter-spacing: -0.04em;
+  }
+  .case-introduction > p {
+    color: var(--fg-dim);
+    font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+    line-height: 1.55;
+  }
+  .case-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+  .case-link {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding-inline: 1rem;
+    border-radius: 5px;
+    font-size: 0.8125rem;
+    font-weight: 650;
+    transition:
+      border-color 160ms var(--ease),
+      background-color 160ms var(--ease),
+      color 160ms var(--ease);
+  }
+  .case-link-primary {
+    background: var(--fg);
+    color: var(--bg);
+  }
+  .case-link-primary:hover {
+    background: var(--accent-bright);
+  }
+  .case-link-secondary {
+    border: 1px solid var(--line-bright);
+    color: var(--fg);
+  }
+  .case-link-secondary:hover {
+    border-color: var(--accent-deep);
+    background: var(--accent-wash);
+    color: var(--accent-bright);
+  }
+
+  .case-brief {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+  }
+  .case-brief > div {
+    min-height: 168px;
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+  .case-brief > div + div {
+    border-left: 1px solid var(--line);
+  }
+  .case-brief dt,
+  .case-stack-row > p,
+  .case-integrations > p {
+    color: var(--fg-faint);
+    font-size: 0.6875rem;
+  }
+  .case-brief dd {
+    margin-top: 1rem;
+    color: var(--fg-dim);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+  .case-stack-row,
+  .case-integrations {
+    display: grid;
+    grid-template-columns: minmax(9rem, 0.25fr) minmax(0, 0.75fr);
+    align-items: start;
+    gap: 1.5rem;
+    padding: 1rem clamp(1.25rem, 3vw, 2rem);
+    border-top: 1px solid var(--line);
+  }
+  .case-stack-row ul,
+  .case-integrations ul,
+  .architecture-step > ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 1rem;
+  }
+  .case-stack-row li,
+  .case-integrations li,
+  .architecture-step > ul li {
+    color: var(--fg-dim);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.6875rem;
+  }
+
+  .case-architecture {
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .case-architecture-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.65fr);
+    align-items: end;
+    gap: 2rem;
+    padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 3vw, 2rem);
+  }
+  .case-architecture-header h4 {
+    max-width: 13ch;
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    font-weight: 520;
+  }
+  .case-architecture-header p {
+    color: var(--fg-dim);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+  .architecture-flow {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .architecture-step {
+    position: relative;
+    min-height: 285px;
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+  .architecture-step + .architecture-step {
+    border-left: 1px solid var(--line);
+  }
+  .architecture-step-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--fg-faint);
+    font-size: 0.625rem;
+  }
+  .architecture-step-top span:first-child {
+    color: var(--signal);
+  }
+  .architecture-step h5 {
+    margin-top: 2rem;
+    font-size: clamp(1.3rem, 2.5vw, 1.75rem);
+    font-weight: 560;
+  }
+  .architecture-step > p {
+    margin-top: 0.75rem;
+    color: var(--fg-dim);
+    font-size: 0.875rem;
+    line-height: 1.65;
+  }
+  .architecture-step > ul {
+    margin-top: 1.5rem;
+  }
+  .case-integrations {
+    border-top: 0;
+  }
+
+  .case-index {
+    position: sticky;
+    z-index: 8;
+    top: calc(var(--nav-h) + 12px);
+    display: flex;
+    min-height: 58px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 0.625rem 1rem;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: rgb(8 8 7 / 0.96);
+  }
+  .case-index > span {
+    flex: none;
+    color: var(--fg-faint);
+    font-size: 0.625rem;
+  }
+  .case-index ol {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .case-index a {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: 0.45rem;
+    padding-inline: 0.75rem;
+    border-radius: 4px;
+    color: var(--fg-dim);
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+  .case-index a:hover,
+  .case-index a:focus-visible {
+    background: var(--surface-2);
+    color: var(--fg);
+  }
+  .case-index a .mono {
+    color: var(--signal);
+    font-size: 0.625rem;
+  }
+
+  .case-chapter {
+    scroll-margin-top: calc(var(--nav-h) + 76px);
+  }
+  .case-chapter + .case-chapter {
+    border-top: 1px solid var(--line);
+  }
+  .case-chapter-header {
+    display: grid;
+    grid-template-columns: minmax(9rem, 0.28fr) minmax(16rem, 0.72fr) minmax(18rem, 1fr);
+    align-items: start;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.25rem, 3vw, 2rem);
+  }
+  .case-chapter-label {
+    color: var(--signal);
+    font-size: 0.6875rem;
+  }
+  .case-chapter-header h4 {
+    max-width: 14ch;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 520;
+  }
+  .case-chapter-header > p:last-child {
+    max-width: 48ch;
+    color: var(--fg-dim);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+  .case-gallery {
+    display: grid;
+    gap: 1px;
+    padding-top: 1px;
+    background: var(--line);
+  }
+  .case-gallery-customer {
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+  .case-gallery-customer .case-figure:first-child {
+    grid-row: span 2;
+  }
+  .case-gallery-scheduling,
+  .case-gallery-operations {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .case-figure {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: var(--surface);
+  }
+  .case-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+  .case-caption {
+    position: absolute;
+    right: 0.625rem;
+    bottom: 0.625rem;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid rgb(240 234 222 / 0.14);
+    border-radius: 3px;
+    background: rgb(8 8 7 / 0.88);
+    color: var(--fg-dim);
+    font-size: 0.625rem;
+  }
+
+  @media (max-width: 820px) {
+    .case-section-heading,
+    .case-title-grid,
+    .case-architecture-header,
+    .case-chapter-header {
+      grid-template-columns: 1fr;
+    }
+    .case-section-heading > p {
+      justify-self: start;
+    }
+    .case-title-grid {
+      min-height: 0;
+    }
+    .case-title {
+      max-width: 9ch;
+    }
+    .case-brief,
+    .architecture-flow {
+      grid-template-columns: 1fr;
+    }
+    .case-brief > div {
+      min-height: 0;
+    }
+    .case-brief > div + div,
+    .architecture-step + .architecture-step {
+      border-top: 1px solid var(--line);
+      border-left: 0;
+    }
+    .architecture-step {
+      min-height: 0;
+    }
+    .case-index {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .case-index ol {
+      width: 100%;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+    }
+    .case-chapter-header {
+      gap: 1rem;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .case-title {
+      font-size: clamp(3.5rem, 18vw, 4.75rem);
+    }
+    .case-links {
+      flex-direction: column;
+    }
+    .case-link {
+      width: 100%;
+    }
+    .case-index {
+      padding: 0.5rem;
+    }
+    .case-index > span {
+      display: none;
+    }
+    .case-index ol {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      overflow: visible;
+      padding-bottom: 0;
+    }
+    .case-index a {
+      justify-content: center;
+      padding: 0.5rem 0.25rem;
+      font-size: 0.6875rem;
+      line-height: 1.25;
+      text-align: center;
+      white-space: normal;
+    }
+    .case-stack-row,
+    .case-integrations {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+    .case-gallery-customer,
+    .case-gallery-scheduling,
+    .case-gallery-operations {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+    }
+    .case-gallery-customer .case-figure:first-child {
+      grid-row: auto;
+    }
+    .case-caption {
+      right: 0.375rem;
+      bottom: 0.375rem;
+    }
+  }
+
+  /* Phase 3: compact recruiter dossier. Education, chronological experience,
+     and capabilities use rows and rails instead of another field of cards. */
+  .phase-three-section,
+  .phase-four-section {
+    scroll-margin-top: calc(var(--nav-h) + 24px);
+    padding-top: clamp(4rem, 8vw, 7rem);
+    padding-bottom: clamp(4rem, 8vw, 7rem);
+    border-top: 1px solid var(--line);
+  }
+  .phase-three-heading,
+  .phase-four-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(17rem, 0.8fr);
+    align-items: end;
+    gap: 2rem;
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+  .phase-three-heading > p,
+  .phase-four-heading > p {
+    max-width: 44ch;
+    justify-self: end;
+    color: var(--fg-dim);
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+  .phase-three-heading-solo {
+    grid-template-columns: 1fr;
+  }
+  .phase-three-title,
+  .phase-four-title {
+    font-variation-settings: "wdth" 112;
+    font-size: clamp(2.75rem, 7vw, 5.5rem);
+    font-weight: 470;
+    letter-spacing: -0.035em;
+  }
+
+  .education-sheet {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(20rem, 0.85fr);
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .education-degree {
+    padding: clamp(1.5rem, 4vw, 3rem);
+  }
+  .education-degree > p:first-child {
+    color: var(--signal);
+    font-size: 0.6875rem;
+  }
+  .education-degree h3 {
+    max-width: 12ch;
+    margin-top: 2.5rem;
+    font-size: clamp(2rem, 5vw, 3.75rem);
+    font-weight: 540;
+  }
+  .education-degree > p:last-child {
+    margin-top: 0.75rem;
+    color: var(--fg-dim);
+    font-size: clamp(1rem, 2vw, 1.125rem);
+  }
+  .education-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-left: 1px solid var(--line);
+  }
+  .education-facts > div {
+    display: flex;
+    min-height: 100%;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+  .education-facts > div + div {
+    border-left: 1px solid var(--line);
+  }
+  .education-facts dt,
+  .profile-context dt,
+  .coursework-row > p {
+    color: var(--fg-faint);
+    font-size: 0.6875rem;
+  }
+  .education-facts dd {
+    margin-top: 0.6rem;
+    color: var(--fg);
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+  .education-facts dd + dd {
+    margin-top: 0.2rem;
+    color: var(--fg-dim);
+    font-size: 0.8125rem;
+  }
+
+  .profile-context-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: 1px;
+    padding: 1px;
+    background: var(--line);
+  }
+  .opportunity-panel,
+  .profile-context {
+    min-height: 230px;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    background: var(--bg);
+  }
+  .opportunity-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .opportunity-status > span {
+    width: 8px;
+    height: 8px;
+    flex: none;
+    margin-top: 0.45rem;
+    border-radius: 999px;
+    background: var(--signal);
+    box-shadow: 0 0 0 5px var(--signal-wash);
+  }
+  .opportunity-status h3 {
+    max-width: 23ch;
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 560;
+  }
+  .opportunity-panel > p,
+  .profile-context > p {
+    margin-top: 1.5rem;
+    color: var(--fg-dim);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+  .profile-context dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+  }
+  .profile-context dd {
+    margin-top: 0.35rem;
+    color: var(--fg);
+    font-size: 0.8125rem;
+  }
+  .coursework-row {
+    display: grid;
+    grid-template-columns: minmax(9rem, 0.25fr) minmax(0, 0.75fr);
+    gap: 1.5rem;
+    margin-top: 1px;
+    padding: 1.25rem clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--line);
+  }
+  .coursework-row ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem 1.5rem;
+  }
+  .coursework-row li {
+    color: var(--fg-dim);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+  }
+
+  .experience-rail {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .experience-entry {
+    display: grid;
+    grid-template-columns: 8.5rem 2.5rem minmax(15rem, 0.8fr) minmax(0, 1.2fr);
+    align-items: stretch;
+  }
+  .experience-entry + .experience-entry {
+    border-top: 1px solid var(--line);
+  }
+  .experience-when,
+  .experience-identity,
+  .experience-highlights {
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+  .experience-when {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .experience-current {
+    color: var(--ok);
+    font-size: 0.6875rem;
+  }
+  .experience-dates {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.75rem;
+    color: var(--fg-faint);
+    font-size: 0.6875rem;
+    line-height: 1.6;
+  }
+  .experience-dates span {
+    color: var(--line-bright);
+  }
+  .experience-rail-marker {
+    position: relative;
+  }
+  .experience-rail-marker::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: var(--line-bright);
+    content: "";
+  }
+  .experience-rail-marker > span {
+    position: absolute;
+    z-index: 1;
+    top: 2.15rem;
+    left: 50%;
+    width: 9px;
+    height: 9px;
+    border: 2px solid var(--bg);
+    border-radius: 999px;
+    background: var(--signal);
+    box-shadow: 0 0 0 1px var(--signal);
+    transform: translateX(-50%);
+  }
+  .experience-identity {
+    border-left: 1px solid var(--line);
+  }
+  .experience-identity h3 {
+    max-width: 19ch;
+    font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+    font-weight: 560;
+  }
+  .experience-organization {
+    margin-top: 0.75rem;
+    color: var(--accent);
+    font-weight: 650;
+  }
+  .experience-organization a {
+    display: inline-flex;
+    min-height: 24px;
+    align-items: center;
+  }
+  .experience-location {
+    margin-top: 0.15rem;
+    color: var(--fg-faint);
+    font-size: 0.8125rem;
+  }
+  .experience-technologies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.65rem;
+    margin-top: 1.5rem;
+  }
+  .experience-technologies li {
+    color: var(--fg-faint);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.625rem;
+  }
+  .experience-technologies li + li::before {
+    margin-right: 0.65rem;
+    color: var(--line-bright);
+    content: "/";
+  }
+  .experience-highlights {
+    border-left: 1px solid var(--line);
+  }
+  .experience-highlights li {
+    position: relative;
+    padding-left: 1rem;
+    color: var(--fg-dim);
+    font-size: 0.875rem;
+    line-height: 1.65;
+  }
+  .experience-highlights li + li {
+    margin-top: 0.875rem;
+  }
+  .experience-highlights li::before {
+    position: absolute;
+    top: 0.72em;
     left: 0;
-    top: 0.6em;
     width: 5px;
-    height: 5px;
-    border-right: 1.5px solid var(--accent);
-    border-bottom: 1.5px solid var(--accent);
-    transform: rotate(-45deg);
+    height: 1px;
+    background: var(--signal);
+    content: "";
+  }
+
+  .capability-matrix {
+    border: 1px solid var(--line);
+  }
+  .capability-row {
+    display: grid;
+    grid-template-columns: minmax(15rem, 0.72fr) minmax(0, 1.28fr);
+    min-height: 150px;
+  }
+  .capability-row + .capability-row {
+    border-top: 1px solid var(--line);
+  }
+  .capability-definition {
+    padding: 1.5rem;
+  }
+  .capability-definition h3 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 550;
+  }
+  .capability-definition p {
+    max-width: 34ch;
+    margin-top: 0.75rem;
+    color: var(--fg-dim);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+  .capability-row > ul {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: minmax(48px, 1fr);
+    align-content: stretch;
+    gap: 0;
+    padding: 0;
+    border-left: 1px solid var(--line);
+    background: var(--bg);
+  }
+  .capability-row > ul li {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    padding: 0.65rem 0.75rem;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--fg-dim);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.625rem;
+    line-height: 1.4;
+  }
+  .capability-row > ul li:nth-child(3n) {
+    border-right: 0;
+  }
+
+  /* Phase 4: proof as a compact archive, followed by a direct co-op close. */
+  .proof-ledger {
+    border: 1px solid var(--line);
+  }
+  .proof-entry {
+    display: grid;
+    grid-template-columns: 8rem minmax(0, 1fr) auto;
+    min-height: 132px;
+    align-items: stretch;
+  }
+  .proof-entry + .proof-entry {
+    border-top: 1px solid var(--line);
+  }
+  .proof-preview {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--surface);
+  }
+  .proof-preview img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--line-bright);
+  }
+  .proof-details {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1.5rem;
+    border-left: 1px solid var(--line);
+  }
+  .proof-status-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+    color: var(--fg-faint);
+    font-size: 0.625rem;
+  }
+  .proof-status-line span:first-child {
+    color: var(--ok);
+  }
+  .proof-details h3 {
+    margin-top: 0.6rem;
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 550;
+  }
+  .proof-details > p {
+    margin-top: 0.35rem;
+    color: var(--fg-dim);
+    font-size: 0.8125rem;
+  }
+  .proof-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    border-left: 1px solid var(--line);
+  }
+  .proof-actions a {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--line-bright);
+    color: var(--fg-dim);
+    font-size: 0.75rem;
+    transition:
+      border-color 160ms var(--ease),
+      color 160ms var(--ease),
+      background 160ms var(--ease);
+  }
+  .proof-actions a:hover,
+  .proof-actions a:focus-visible {
+    border-color: var(--signal);
+    background: var(--signal-wash);
+    color: var(--fg);
+  }
+
+  .contact-section {
+    scroll-margin-top: calc(var(--nav-h) + 24px);
+    border-top: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+  }
+  .contact-topline {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--fg-faint);
+    font-size: 0.625rem;
+  }
+  .contact-availability {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: var(--fg-dim);
+  }
+  .contact-availability > span {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--ok);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 14%, transparent);
+  }
+  .contact-introduction {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.65fr);
+    align-items: end;
+    gap: 2rem;
+    padding: clamp(2rem, 6vw, 5rem) clamp(1.25rem, 4vw, 3rem);
+  }
+  .contact-title {
+    max-width: 9ch;
+    font-variation-settings: "wdth" 106;
+    font-size: clamp(3.75rem, 9vw, 8rem);
+    font-weight: 470;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .contact-introduction > p {
+    max-width: 48ch;
+    color: var(--fg-dim);
+    font-size: clamp(1rem, 1.6vw, 1.125rem);
+    line-height: 1.65;
+  }
+  .contact-primary-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    padding: 1px 0;
+    background: var(--line);
+  }
+  .contact-channel {
+    display: flex;
+    min-width: 0;
+    min-height: 180px;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    background: var(--bg);
+    transition:
+      background 180ms var(--ease),
+      color 180ms var(--ease);
+  }
+  .contact-channel > span {
+    color: var(--fg-faint);
+    font-size: 0.6875rem;
+  }
+  .contact-channel strong {
+    overflow-wrap: anywhere;
+    font-size: clamp(1.35rem, 2.5vw, 2.25rem);
+    font-weight: 520;
+    letter-spacing: -0.035em;
+  }
+  .contact-channel:hover,
+  .contact-channel:focus-visible {
+    background: var(--surface-raised);
+  }
+  .contact-channel-booking {
+    background: var(--fg);
+    color: var(--bg);
+  }
+  .contact-channel-booking > span {
+    color: color-mix(in srgb, var(--bg) 64%, transparent);
+  }
+  .contact-channel-booking:hover,
+  .contact-channel-booking:focus-visible {
+    background: var(--accent);
+    color: var(--bg);
+  }
+  .contact-support-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .contact-support-actions li + li {
+    border-left: 1px solid var(--line);
+  }
+  .contact-support-actions a {
+    display: flex;
+    min-height: 64px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    color: var(--fg-dim);
+    font-size: 0.8125rem;
+    transition:
+      background 160ms var(--ease),
+      color 160ms var(--ease);
+  }
+  .contact-support-actions a:hover,
+  .contact-support-actions a:focus-visible {
+    background: var(--surface);
+    color: var(--fg);
+  }
+  .contact-support-actions a span:last-child {
+    color: var(--fg-faint);
+    font-size: 0.625rem;
+  }
+
+  .site-footer {
+    border-top: 1px solid var(--line);
+  }
+  .site-footer-inner {
+    display: flex;
+    min-height: 88px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    color: var(--fg-faint);
+    font-size: 0.75rem;
+  }
+  .site-footer-role {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.35rem 0.6rem;
+  }
+  .site-footer a {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    color: var(--fg-dim);
+  }
+  .site-footer a:hover,
+  .site-footer a:focus-visible {
+    color: var(--accent);
+  }
+
+  @media (max-width: 900px) {
+    .education-sheet {
+      grid-template-columns: 1fr;
+    }
+    .education-facts {
+      border-top: 1px solid var(--line);
+      border-left: 0;
+    }
+    .experience-entry {
+      grid-template-columns: 8rem 2.25rem minmax(0, 1fr);
+    }
+    .experience-when {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+    }
+    .experience-rail-marker {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
+    .experience-identity {
+      grid-column: 3;
+      grid-row: 1;
+    }
+    .experience-highlights {
+      grid-column: 3;
+      grid-row: 2;
+      padding-top: 0;
+    }
+    .capability-row {
+      grid-template-columns: 1fr;
+    }
+    .capability-row > ul {
+      border-top: 1px solid var(--line);
+      border-left: 0;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .phase-three-heading,
+    .phase-four-heading,
+    .profile-context-grid {
+      grid-template-columns: 1fr;
+    }
+    .phase-three-heading > p,
+    .phase-four-heading > p {
+      justify-self: start;
+    }
+    .proof-entry {
+      grid-template-columns: 5.5rem minmax(0, 1fr);
+    }
+    .proof-preview {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+      align-items: flex-start;
+      padding: 0.75rem;
+    }
+    .proof-details {
+      grid-column: 2;
+      grid-row: 1;
+      padding: 1rem;
+      border-left: 0;
+    }
+    .proof-actions {
+      grid-column: 2;
+      grid-row: 2;
+      padding: 0 1rem 1rem;
+      border-left: 0;
+    }
+    .contact-introduction,
+    .contact-primary-actions,
+    .contact-support-actions {
+      grid-template-columns: 1fr;
+    }
+    .contact-introduction {
+      align-items: start;
+    }
+    .contact-title {
+      font-size: clamp(3.5rem, 17vw, 5.75rem);
+    }
+    .contact-channel {
+      min-height: 150px;
+    }
+    .contact-support-actions li + li {
+      border-top: 1px solid var(--line);
+      border-left: 0;
+    }
+    .site-footer-inner {
+      min-height: 0;
+      align-items: flex-start;
+      flex-direction: column;
+      padding-top: 1.5rem;
+      padding-bottom: 1.5rem;
+    }
+    .site-footer-role {
+      justify-content: flex-start;
+    }
+    .education-facts {
+      grid-template-columns: 1fr;
+    }
+    .education-facts > div {
+      min-height: 130px;
+    }
+    .education-facts > div + div {
+      border-top: 1px solid var(--line);
+      border-left: 0;
+    }
+    .opportunity-panel,
+    .profile-context {
+      min-height: 0;
+    }
+    .coursework-row {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .experience-entry {
+      grid-template-columns: 1.5rem minmax(0, 1fr);
+    }
+    .experience-when {
+      grid-column: 2;
+      grid-row: 1;
+      align-items: center;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding-bottom: 0.75rem;
+    }
+    .experience-current,
+    .experience-dates {
+      margin-top: 0;
+    }
+    .experience-dates {
+      flex-direction: row;
+      gap: 0.35rem;
+    }
+    .experience-rail-marker {
+      grid-column: 1;
+      grid-row: 1 / span 3;
+    }
+    .experience-rail-marker > span {
+      top: 1.75rem;
+    }
+    .experience-identity {
+      grid-column: 2;
+      grid-row: 2;
+      padding-top: 0;
+      border-left: 0;
+    }
+    .experience-highlights {
+      grid-column: 2;
+      grid-row: 3;
+      border-left: 0;
+    }
+    .capability-definition {
+      padding: 1.25rem;
+    }
+    .capability-row > ul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .capability-row > ul li:nth-child(3n) {
+      border-right: 1px solid var(--line);
+    }
+    .capability-row > ul li:nth-child(2n) {
+      border-right: 0;
+    }
+    .coursework-row ul {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .proof-entry {
+      grid-template-columns: 4.75rem minmax(0, 1fr);
+    }
+    .proof-preview {
+      padding: 0.625rem;
+    }
+    .proof-actions {
+      align-items: stretch;
+      flex-direction: column;
+    }
+    .proof-actions a {
+      width: 100%;
+    }
+    .contact-topline {
+      align-items: flex-start;
+      flex-direction: column;
+    }
   }
 
   .link-underline {
@@ -289,248 +1849,40 @@
   .link-underline:focus-visible {
     background-size: 100% 1px;
   }
-
-  /* Pointer target expander.
-
-     The footer and hero link rows are 14px text: an 18px-tall, 36px-wide box
-     for "Email". Padding them out to 44px is the obvious fix and the wrong
-     one — .link-underline paints its rule at `background-position: 0 100%`,
-     so a taller box drops the underline 13px below the baseline it belongs
-     to. This stretches a transparent hit area around the link instead,
-     centred on it, and moves no painted pixel.
-
-     Only safe where the targets do not sit close enough for the expanded
-     areas to collide. Both rows it is used on are single-line at 375px and
-     up, with a 20px gap; a vertical menu needs real padding instead — see
-     the mobile panel in Nav.tsx. */
-  .tap {
-    position: relative;
-  }
-  .tap::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: max(100%, 44px);
-    height: max(100%, 44px);
-    transform: translate(-50%, -50%);
-  }
-
-  /* Native <details> disclosure — the project cards' "Details" panel.
-     Zero JS: it is keyboard accessible and works before hydration and with
-     scripting off, which is the whole reason it is not a React toggle. */
-  .disclosure > summary {
-    list-style: none;
-  }
-  /* Safari/Chrome draw their own triangle on top of ours without this. */
-  .disclosure > summary::-webkit-details-marker {
-    display: none;
-  }
-  .disclosure[open] > summary {
-    color: var(--accent);
-  }
-  .disclosure-chevron {
-    display: inline-block;
-    margin-right: 0.5rem;
-    font-size: 0.6875rem;
-    transition: transform 180ms var(--ease);
-  }
-  .disclosure[open] .disclosure-chevron {
-    transform: rotate(90deg);
-  }
 }
 
 /* ==========================================================================
-   Motion — transform and opacity only. Nothing here repaints on scroll.
+   Motion — one coordinated entrance and one quiet systems signal.
    ========================================================================== */
-/* Layered, like everything else in this file. `.rise` and `.reveal` only set
-   animation and transition, so nothing competes with them today — but an
-   unlayered rule here would outrank every Tailwind utility the moment one
-   did, which is exactly the trap that cost a phase in `a { color: inherit }`.
-   The reduced-motion overrides sit last inside the layer, so they beat the
-   `.card:hover` lift declared earlier in the same layer. */
 @layer components {
-
-  /* Reveal targets are VISIBLE by default. The hidden state is gated behind
-     [data-reveal-ready], which phase 7's mounter stamps on <html> before first
-     paint. Without JS — or between phases, before the mounter exists — nothing
-     is ever stranded at opacity 0. */
-  .reveal {
-    transition:
-      opacity 560ms var(--ease),
-      transform 560ms var(--ease);
-  }
-  [data-reveal-ready] .reveal {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  [data-reveal-ready] .reveal.in {
-    opacity: 1;
-    transform: none;
-  }
-
-  @keyframes rise {
+  /* One coordinated opening sequence. The map routes continue quietly after
+     the entrance, but no other hero element loops or demands attention. */
+  @keyframes hero-enter {
     from {
       opacity: 0;
-      transform: translateY(14px);
+      transform: translateY(18px);
     }
     to {
       opacity: 1;
       transform: none;
     }
   }
-  .rise {
-    animation: rise 520ms var(--ease) both;
+  .hero-enter {
+    animation: hero-enter 640ms var(--ease) both;
+  }
+  .hero-enter-delay-1 {
+    animation-delay: 80ms;
+  }
+  .hero-enter-delay-2 {
+    animation-delay: 160ms;
+  }
+  .hero-enter-delay-3 {
+    animation-delay: 240ms;
   }
 
-  /* Terminal caret blink. Used by the typewriter's cover edge below. */
-  @keyframes caret {
-    0%,
-    49% {
-      opacity: 1;
-    }
-    50%,
-    100% {
-      opacity: 0;
-    }
-  }
-  /* Typewriter role line, under the name in the hero.
-
-     Each role types itself out one character at a time, holds, deletes itself
-     and hands over to the next. No timer, no state, no third "use client"
-     component: a JS rotator would re-render, several times a second, the one
-     element guaranteed to be on screen the whole time the page is open.
-
-     HOW IT WORKS, because it is not the usual recipe. Every CSS typewriter on
-     the internet animates `width` with `steps()`, and this project bans
-     animating width — it is a layout property, so each of those steps is a
-     reflow of everything after it on the line. What moves here instead is an
-     opaque cover the exact size of the role, painted in --bg and laid over it.
-     At rest it hides the text completely; `transform: translateX()` slides it
-     off to the right in `steps(--chars)`, uncovering one character per step,
-     and slides it back to delete. Transform only. Nothing reflows, and the
-     cover composites on the GPU like every other animation in this file.
-
-     --chars is the role's character count, set inline per span in Hero.tsx.
-     It is the number of steps, and it lands one character per step only
-     because this line is set in DM Mono — every glyph is the same width. Set
-     this in a proportional face and the steps drift out of phase with the
-     letters. The `var(--chars, 16)` fallback keeps the sweep running (as a
-     smooth slide rather than a stepped one) if the variable ever goes missing,
-     which beats the alternative: an invalid timing function would take the
-     whole shorthand down and leave the line permanently covered.
-
-     grid-area 1/1 stacks all three roles in one cell, so the box is as wide as
-     the longest of them and nothing after it shifts as the text changes.
-     justify-self: start keeps each span its own natural width, which is what
-     the cover measures itself against.
-
-     12s is 3 roles x 4s, and the keyframe stops are tuned to that: 1s typing,
-     2s held, 1s deleting. A fourth role in site.roles means retuning both
-     keyframe blocks and ROLE_SECONDS in Hero.tsx. */
-  .type-cycle {
-    display: inline-grid;
-  }
-  .type-cycle > * {
-    grid-area: 1 / 1;
-    justify-self: start;
-    position: relative;
-    /* Hidden is the base state, and the fill mode is `none` rather than the
-       `both` every other animation in this file uses. That is not a slip.
-
-       With `both`, an animation that has not started yet paints its 0%
-       keyframe, and 0% here is the visible one. So for the first four seconds
-       of a page load role two was filling forwards into view, and role three
-       for the first eight - each of them a cover-sized black rectangle laid
-       over role one, which was typing away underneath and never seen. The
-       symptom was an empty line under the name.
-
-       `none` means an animation in its delay phase contributes nothing and
-       the base style below is what shows: opacity 0, correctly out of the
-       way. Nothing is stranded there, because these animations are infinite
-       and so never reach an after-phase. */
-    opacity: 0;
-    animation: type-show 12s linear infinite;
-  }
-  @keyframes type-show {
-    0%,
-    33.33% {
-      opacity: 1;
-    }
-    33.34%,
-    100% {
-      opacity: 0;
-    }
-  }
-
-  .type-cover {
-    position: absolute;
-    inset: 0;
-    background: var(--bg);
-    pointer-events: none;
-    animation-name: type-sweep;
-    animation-duration: 12s;
-    animation-iteration-count: infinite;
-    animation-fill-mode: both;
-    animation-timing-function: steps(var(--chars, 16));
-  }
-  /* The cover's left edge is the caret, so it sits at the typing position for
-     free and needs no separate animation to travel. It only has to blink. */
-  .type-cover::before {
-    content: "";
-    position: absolute;
-    left: -1px;
-    top: 0.1em;
-    bottom: 0.1em;
-    width: 2px;
-    background: var(--accent);
-    animation: caret 1.06s step-end infinite;
-  }
-  @keyframes type-sweep {
-    0% {
-      transform: translateX(0);
-    }
-    8.333% {
-      transform: translateX(100%);
-    }
-    25% {
-      transform: translateX(100%);
-    }
-    33.333% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(0);
-    }
-  }
-
-  /* Screenshot cycler on a project card. Same mechanism, same reasons.
-
-     Seven frames, 2.5s each, so a 17.5s loop; the delay is set inline per
-     frame from the gallery index. Frames are stacked in a grid cell rather
-     than absolutely positioned, so the card's height still comes from the
-     images themselves and there is no aspect-ratio box to keep in sync.
-
-     Opacity only. The card does not resize, nothing reflows, and there is no
-     scroll or pointer listener anywhere near it. */
-  .photo-cycle {
-    display: grid;
-  }
-  .photo-cycle > * {
-    grid-area: 1 / 1;
-    animation: photo-cycle 17.5s linear infinite both;
-  }
-  @keyframes photo-cycle {
-    0% {
-      opacity: 0;
-    }
-    2%,
-    14.29% {
-      opacity: 1;
-    }
-    16.29%,
-    100% {
-      opacity: 0;
+  @keyframes system-route {
+    to {
+      stroke-dashoffset: -48;
     }
   }
 
@@ -541,45 +1893,9 @@
     *,
     *::before,
     *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
+      animation: none !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
-    }
-    /* Never leave content stranded at opacity 0 when the observer is skipped. */
-    [data-reveal-ready] .reveal {
-      opacity: 1;
-      transform: none;
-    }
-    .card:hover {
-      transform: none;
-    }
-    /* Both cyclers stack their frames and show one at a time. The blanket
-       duration override above lands every frame on its final keyframe, which
-       is opacity 0 for all of them, so the hero role line and the project
-       screenshot would both go blank. Pin frame one instead.
-
-       The typewriter needs one more pin than the photo cycler: killing the
-       sweep leaves the cover at its declared transform, which is none — the
-       covered state. Push it fully off so the role reads as finished typing,
-       and hold the caret steady after it rather than letting the blink land
-       on its own 100% keyframe, which is also opacity 0. */
-    .type-cycle > *,
-    .photo-cycle > * {
-      animation: none !important;
-      opacity: 0;
-    }
-    .type-cycle > :first-child,
-    .photo-cycle > :first-child {
-      opacity: 1;
-    }
-    .type-cover {
-      animation: none !important;
-      transform: translateX(100%);
-    }
-    .type-cover::before {
-      animation: none !important;
-      opacity: 1;
     }
   }
 }

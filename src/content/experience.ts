@@ -26,7 +26,7 @@ export type Role = {
   readonly end: string;
   readonly current: boolean;
   readonly kind: RoleKind;
-  /** Tech surfaced as tags on the card. Drawn only from this role's bullets. */
+  /** Tech surfaced in the timeline entry. Drawn only from this role's bullets. */
   readonly stack: readonly string[];
   /**
    * Every bullet the CV carries for this role, strongest first.
@@ -36,9 +36,9 @@ export type Role = {
    */
   readonly bullets: readonly string[];
   /**
-   * How many of `bullets` the card renders. Omitted means all of them.
+   * How many of `bullets` the timeline renders. Omitted means all of them.
    *
-   * The PDF keeps the full list; a card with six bullets stops being scannable,
+   * The PDF keeps the full list; six web bullets stop being scannable,
    * which is the whole job of this section. Trimming here rather than in the
    * component keeps the decision next to the copy it applies to.
    */
@@ -60,6 +60,7 @@ export const experience: readonly Role[] = [
       "Develop and maintain server-side logic, database integrations and APIs, troubleshooting issues and validating changes before deployment.",
       "Document technical workflows and coordinate development priorities with team members in a fast-paced, deadline-driven environment.",
     ],
+    webBullets: 2,
   },
   {
     slug: "sparkwebdigital",
@@ -84,18 +85,18 @@ export const experience: readonly Role[] = [
       "Configured CI/CD pipelines with GitHub Actions to automate testing and deployment across multiple client projects.",
       "Manage DNS configuration, SSL certificates, hosting environments and domain routing for every client site, troubleshooting connectivity and performance issues independently.",
       "Write Python scripts to automate data processing, reporting and repetitive administrative tasks for clients.",
-      // Below the cut. Both stay in the PDF; neither earns card space here.
+      // Below the cut. Both stay in the PDF; neither earns timeline space here.
       // The first is the generic lifecycle opener, which the About paragraph
       // already says in Abdllah's own voice. The second is a soft skill that
       // reads as filler next to four concrete builds.
       "Design, develop and deploy responsive websites for small business clients using JavaScript, React, HTML, CSS and Supabase, covering the full project lifecycle from requirements gathering to production deployment.",
       "Communicate project updates, technical decisions and issue resolutions to non-technical stakeholders in clear, accessible language.",
     ],
-    webBullets: 4,
+    webBullets: 3,
   },
 ] as const;
 
-/** The roles that get full cards. Every role is one, since the retail pair
+/** The roles that get full timeline entries. Every role is one, since the retail pair
     came off the site; the filter stays so adding a `kind: "retail"` entry
     back to the array cannot silently put it on the page. */
 export const technicalRoles = experience.filter((r) => r.kind === "technical");

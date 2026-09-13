@@ -5,66 +5,42 @@
  * person, shorter clauses. No fact is added, removed or upgraded.
  */
 
-/**
- * The professional summary, split into paragraphs for reading rhythm.
- * Source: docs/resume.md § Professional summary.
- *
- * "third-year" is the one word here that is not lifted from the CV. It is
- * arithmetic, not a claim: the degree started Sep 2024, so the 2026/27 year is
- * the third. Recruiters filter co-op postings by year of study, which is why
- * it earns a place in the first sentence.
- */
-export const summary: readonly string[] = [
-  "I'm a third-year Computer Science student at Sheridan College, specializing in " +
-    "Cloud Computing. My hands-on experience is in building full-stack web applications, " +
-    "automating workflows with Python, and managing cloud-hosted infrastructure.",
+/** Professional context shown once in the candidate profile. */
+export const studioSummary =
   "I run SparkWebDigital, a freelance web development business serving small business " +
-    "clients across the GTA, from requirements gathering through to production deployment, " +
-    "including DNS, SSL and hosting.",
-  "I work in JavaScript, React, Python, SQL and MongoDB, with foundational knowledge of " +
-    "AWS, Azure, Linux and networking.",
-] as const;
+  "clients across the GTA, from requirements gathering through to production deployment, " +
+  "including DNS, SSL and hosting.";
 
 /**
  * The hero paragraph. Three clauses, first person, deliberately shorter than
- * `summary` — the hero is a hook, not a bio. Every claim is a clause of the
- * CV's professional summary.
+ * the CV's professional summary. It stays separate from the studio context in
+ * the candidate profile so the page does not repeat its opening paragraph.
  *
  * Kept separate from `site.description`, which is the <meta> string: search
  * results want the third-person full sentence, the page does not.
  */
 export const heroBlurb =
-  "I build full-stack web applications, automate workflows with Python, and manage " +
-  "cloud-hosted infrastructure. I also run SparkWebDigital, a freelance web development " +
-  "studio serving small businesses across the GTA.";
+  "I'm a third-year Computer Science student at Sheridan College specializing in " +
+  "Cloud Computing. I build full-stack applications, automate workflows with Python, " +
+  "and manage cloud-hosted infrastructure.";
+
+/** The opportunity signal shown above the fold for recruiter scanning. */
+export const coOpAvailability = "Open to Winter / Summer 2027 co‑op";
 
 /**
  * What he is looking for, in one sentence.
  *
  * This used to live in Contact as `contactIntro`, and About carried a separate
- * `Seeking` row listing the same three areas as bare labels. Two statements of
- * one fact, in two sections, is the kind of padding that reads as filler — so
- * there is now exactly one, and it sits in the "What I Do" card in About where
- * a recruiter is already reading about him.
+ * `Seeking` row listing the same three areas as bare labels. The candidate
+ * profile now pairs this sentence with the availability signal so the target
+ * roles are stated once, where a recruiter is already checking education.
  *
  * The term is Winter/Summer 2027, not Fall 2026: Abdllah moved the target.
- * Both halves still trace to the CV — the co-op objective, and SparkWebDigital
- * as a going concern rather than a past project.
+ * The target areas still trace directly to the CV's co-op objective.
  */
 export const seekingStatement =
-  "Open to 2027 winter/summer co-op and internship roles in software development, " +
-  "cloud engineering and QA, and to freelance work through SparkWebDigital.";
-
-/**
- * The four lines of the "What I Do" card in About. Each is a compression of a
- * clause in the CV's professional summary — nothing here is a new claim.
- */
-export const whatIDo: readonly string[] = [
-  "Build and ship full-stack web applications",
-  "Automate workflows with Python",
-  "Deploy and manage cloud-hosted infrastructure",
-  "Run SparkWebDigital, a freelance web development studio in the GTA",
-] as const;
+  "Targeting Winter and Summer 2027 co-op or internship roles in software " +
+  "development, cloud engineering, and QA.";
 
 export type Education = {
   readonly degree: string;

@@ -1,95 +1,168 @@
 /**
- * Projects. Source: docs/resume.md § Projects.
- *
- * One entry, deliberately. Reseller Panel, Database Design and Network
- * Architecture Analysis were here and Abdllah cut all three: the last two were
- * coursework, and a section where three of four cards are assignments makes the
- * fourth look like one too. He is building a second real project to sit beside
- * Barber's Touch. The CV still lists all four.
- *
- * `href` is barberstouch.ca, supplied by Abdllah on 2026-09-12. It was absent
- * for a long time and the section was built to render cleanly without it, so a
- * future entry with no live URL is still safe: omit the field rather than
- * pointing a dead "Live" link at "#". The CV gives no project dates either way.
- *
- * `gallery` exists only for Barber's Touch. Its seven raw captures live in
- * docs/assets/barbers-touch/ (1900x1080 PNGs, up to 1.7 MB each); the card uses
- * 1280x720 WebP derivatives at public/projects/barbers-touch/ instead, because
- * next.config sets images.unoptimized: a static export ships whatever byte count
- * is in public/, and a 1.1 MB card image is how a portfolio earns the word
- * "laggy". All seven derivatives together are about 170 KB.
- *
- * The raw captures are in docs/, not public/, for the same reason: they were
- * 3.4 MB of the 4.6 MB export while nothing on the site linked to them. Source
- * material goes in docs/; only derivatives go in public/. Regenerate a
- * derivative for any new screenshot; never point a gallery frame at a raw PNG.
- *
- * mobile.webp is the one portrait capture (376x848). It is centred on a
- * #111823 (--surface) canvas rather than cropped, so it fills the same 16:9 box
- * as the other six and the card never changes height mid-cycle.
- *
- * Cards without a gallery render no image and no grey placeholder box: a row of
- * empty rectangles reads worse than no images.
+ * Selected work. The detailed Barber's Touch content is grounded in the
+ * résumé and the project's public showcase repository. The commissioned
+ * source repository remains private, so this portfolio links to the technical
+ * overview rather than implying that the application code is public.
  */
+
+export type ProjectImage = {
+  readonly src: string;
+  readonly alt: string;
+  readonly caption: string;
+};
+
+export type ProjectChapter = {
+  readonly id: string;
+  readonly label: string;
+  readonly title: string;
+  readonly description: string;
+  readonly images: readonly ProjectImage[];
+};
+
+export type ArchitectureStep = {
+  readonly label: string;
+  readonly title: string;
+  readonly description: string;
+  readonly technologies: readonly string[];
+};
 
 export type Project = {
   readonly slug: string;
   readonly title: string;
-  /** e.g. "Full-stack", "Academic". Describes the kind of work, not a claim. */
   readonly role: string;
-  /** One sentence, the card's visible description. */
+  readonly status: string;
   readonly summary: string;
-  /** The CV bullets, shown in the card's disclosure. */
-  readonly detail: readonly string[];
+  readonly brief: readonly {
+    readonly label: string;
+    readonly text: string;
+  }[];
   readonly stack: readonly string[];
-  /** Not on the CV. Fill in when Abdllah supplies it. */
-  readonly year?: string;
-  readonly href?: string;
-  /** GitHub URL. Rendered as the GitHub mark plus "More info", not "Code". */
-  readonly repo?: string;
-  /**
-   * Screenshots, cross-faded in this order, one every 2.5s. Paths are under
-   * public/ and every frame is an optimized 16:9 WebP derivative.
-   *
-   * `alt` is written only for the first frame: it is the one that describes the
-   * project for a screen reader. The rest are the same subject re-shot and
-   * carry alt="" so they are skipped rather than announced seven times.
-   */
-  readonly gallery?: readonly { readonly src: string; readonly alt: string }[];
+  readonly href: string;
+  readonly repo: string;
+  readonly architecture: readonly ArchitectureStep[];
+  readonly integrations: readonly string[];
+  readonly chapters: readonly ProjectChapter[];
 };
 
 export const projects: readonly Project[] = [
   {
     slug: "barbers-touch",
     title: "Barber's Touch",
-    role: "Full-stack",
+    role: "Full-stack product build",
+    status: "Live in production",
     summary:
-      "A full-stack appointment booking app for a barbershop, with authentication, scheduling and an admin dashboard.",
-    detail: [
-      "Built a full-stack appointment booking application using React, Node.js and Supabase (PostgreSQL), with user authentication, appointment scheduling and an admin dashboard.",
-      "Integrated the Google Maps API for location display and the Resend API for automated email appointment reminders.",
+      "A production platform connecting public booking with the barbershop's calendar, checkout, client records, staff scheduling, and revenue reporting.",
+    brief: [
+      {
+        label: "Problem",
+        text: "Bring customer booking and day-to-day shop operations into one system.",
+      },
+      {
+        label: "Contribution",
+        text: "Built end to end across requirements, UX, frontend, backend, database design, security, deployment, and maintenance.",
+      },
+      {
+        label: "Shipped result",
+        text: "A live platform actively used for online bookings and operational workflows.",
+      },
     ],
     stack: [
-      "React",
-      "Node.js",
+      "React 19",
+      "TypeScript",
       "Supabase",
       "PostgreSQL",
-      "Google Maps API",
-      "Resend API",
+      "Edge Functions",
+      "Vercel",
     ],
     href: "https://barberstouch.ca",
     repo: "https://github.com/Abood-005/barbers-touch-showcase",
-    gallery: [
+    architecture: [
       {
-        src: "/projects/barbers-touch/home.webp",
-        alt: "The Barber's Touch home page: a barbershop landing page with a booking call to action.",
+        label: "Interface",
+        title: "React + Vite",
+        description:
+          "Responsive customer, admin, and employee experiences share one product surface.",
+        technologies: ["React 19", "TypeScript", "Vite"],
       },
-      { src: "/projects/barbers-touch/work.webp", alt: "" },
-      { src: "/projects/barbers-touch/booking.webp", alt: "" },
-      { src: "/projects/barbers-touch/dashboard.webp", alt: "" },
-      { src: "/projects/barbers-touch/calendar.webp", alt: "" },
-      { src: "/projects/barbers-touch/checkout.webp", alt: "" },
-      { src: "/projects/barbers-touch/mobile.webp", alt: "" },
+      {
+        label: "Server boundary",
+        title: "Edge Functions",
+        description:
+          "Validated server-side workflows handle booking submission, email, and rate limits.",
+        technologies: ["Deno", "Upstash Redis", "Resend"],
+      },
+      {
+        label: "Data and access",
+        title: "Supabase",
+        description:
+          "PostgreSQL, authentication, row-level security, and realtime subscriptions keep roles and records synchronized.",
+        technologies: ["PostgreSQL", "Auth", "RLS", "Realtime"],
+      },
+    ],
+    integrations: ["Google Maps / Places", "Resend", "Upstash Redis", "Vercel"],
+    chapters: [
+      {
+        id: "customer",
+        label: "Customer experience",
+        title: "From discovery to booking",
+        description:
+          "Responsive marketing pages move visitors from services and work examples into multi-service booking, barber selection, and live slot availability.",
+        images: [
+          {
+            src: "/projects/barbers-touch/home.webp",
+            alt: "Barber's Touch home page with a split-screen hero and booking call to action.",
+            caption: "Public home page",
+          },
+          {
+            src: "/projects/barbers-touch/work.webp",
+            alt: "Barber's Touch work gallery showing a collection of finished haircuts.",
+            caption: "Work gallery",
+          },
+          {
+            src: "/projects/barbers-touch/mobile.webp",
+            alt: "Barber's Touch home page presented in its narrow mobile layout.",
+            caption: "Mobile experience",
+          },
+        ],
+      },
+      {
+        id: "scheduling",
+        label: "Scheduling",
+        title: "Availability before submission",
+        description:
+          "The booking flow accounts for selected services, barber hours, current bookings, and a no-preference path; the authenticated calendar organizes appointments by barber.",
+        images: [
+          {
+            src: "/projects/barbers-touch/booking.webp",
+            alt: "Booking form with service, barber, date, and time selection controls.",
+            caption: "Customer booking flow",
+          },
+          {
+            src: "/projects/barbers-touch/calendar.webp",
+            alt: "Administrative day calendar with appointment columns for individual barbers.",
+            caption: "Day-view staff calendar",
+          },
+        ],
+      },
+      {
+        id: "operations",
+        label: "Operations",
+        title: "The shop behind the website",
+        description:
+          "Authenticated tools cover revenue, checkout, transactions, clients, recurring schedules, and staff management, with employee access separated from owner-only controls.",
+        images: [
+          {
+            src: "/projects/barbers-touch/dashboard.webp",
+            alt: "Administrative dashboard with booking, revenue, service, and activity summaries.",
+            caption: "Owner dashboard",
+          },
+          {
+            src: "/projects/barbers-touch/checkout.webp",
+            alt: "Point-of-sale checkout interface with services, payment methods, discounts, and client details.",
+            caption: "Point-of-sale checkout",
+          },
+        ],
+      },
     ],
   },
 ] as const;

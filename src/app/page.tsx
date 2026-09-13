@@ -22,7 +22,7 @@ export default function Home() {
     <>
       <Nav />
 
-      <main id="main" className="shell pb-24">
+      <main id="main" tabIndex={-1} className="shell pb-24">
         <Hero />
 
         <About />

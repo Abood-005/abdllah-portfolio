@@ -1,15 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { links, sections, site } from "@/content";
 import { Close, Menu } from "@/components/ui/Icons";
+import { links, sections, site } from "@/content";
+
+const mobileLinks = links.filter((link) => link.label !== "SparkWebDigital");
 
 /**
- * Sticky top bar. One of only two client components on the site — it needs
- * state for the scroll spy and the mobile panel.
- *
- * The background is solid --bg. No backdrop filter, ever: a translucent bar
- * forces a full-viewport repaint on every scroll frame.
+ * Floating navigation strip. The solid surface keeps text legible without a
+ * costly blur, while the inset frame separates navigation from page content.
  */
 export function Nav() {
   const [active, setActive] = useState<string>(sections[0].id);
@@ -17,33 +16,29 @@ export function Nav() {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  /* -- scroll spy: one observer, no scroll listener ---------------------- */
   useEffect(() => {
     const nodes = sections
-      .map((s) => document.getElementById(s.id))
-      .filter((n): n is HTMLElement => n !== null);
+      .map((section) => document.getElementById(section.id))
+      .filter((node): node is HTMLElement => node !== null);
     if (nodes.length === 0) return;
 
     const visible = new Set<string>();
-    const io = new IntersectionObserver(
+    const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) visible.add(entry.target.id);
           else visible.delete(entry.target.id);
         }
-        // Keep the document-order first of whatever is in the band, so the
-        // highlight never flickers between two adjacent sections.
-        const first = sections.find((s) => visible.has(s.id));
+        const first = sections.find((section) => visible.has(section.id));
         if (first) setActive(first.id);
       },
       { rootMargin: "-45% 0px -50% 0px", threshold: 0 },
     );
 
-    nodes.forEach((n) => io.observe(n));
-    return () => io.disconnect();
+    nodes.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
   }, []);
 
-  /* -- mobile panel ------------------------------------------------------ */
   const close = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
@@ -52,12 +47,12 @@ export function Nav() {
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
         close();
         return;
       }
-      if (e.key !== "Tab" || !panelRef.current) return;
+      if (event.key !== "Tab" || !panelRef.current) return;
 
       const focusable = panelRef.current.querySelectorAll<HTMLElement>(
         'a[href], button:not([disabled])',
@@ -66,11 +61,11 @@ export function Nav() {
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
 
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
         last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
         first.focus();
       }
     };
@@ -88,121 +83,139 @@ export function Nav() {
   }, [open, close]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-bg">
-      <nav
-        aria-label="Sections"
-        className="shell flex h-[var(--nav-h)] items-center justify-between gap-6"
-      >
-        <a
-          href="#main"
-          className="display text-[0.95rem] tracking-tight transition-colors hover:text-accent"
-        >
-          {site.firstName}
-          <span className="text-accent">.</span>
-        </a>
-
-        <ul className="hidden items-center gap-7 text-[0.875rem] md:flex">
-          {sections.map((s) => (
-            <li key={s.id}>
-              <a
-                href={`#${s.id}`}
-                aria-current={active === s.id ? "true" : undefined}
-                className={
-                  active === s.id
-                    ? "text-accent underline decoration-1 underline-offset-8"
-                    : "text-fg-dim transition-colors hover:text-accent"
-                }
-              >
-                {s.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        <div className="flex items-center gap-2">
+    <header className="pointer-events-none sticky top-0 z-40 h-[var(--nav-h)]">
+      <nav aria-label="Sections" className="shell flex h-full items-center">
+        <div className="nav-frame pointer-events-auto flex w-full items-center justify-between gap-5">
           <a
-            href={site.resume}
-            className="rounded-lg border border-accent-deep bg-accent-wash px-3 py-1.5 text-[0.8125rem] text-accent-bright transition-colors hover:border-accent hover:text-accent"
+            href="#main"
+            className="display inline-flex min-h-11 shrink-0 items-center text-[0.95rem] tracking-tight transition-colors hover:text-accent"
           >
-            Resume
+            {site.firstName}
+            <span className="text-signal">.</span>
           </a>
-          {/* aria-haspopup, not aria-expanded. What opens is a modal dialog,
-              not a region attached to this button, and the label is fixed at
-              "Open menu" — pairing that with aria-expanded="true" makes a
-              screen reader announce "Open menu, expanded", which is a
-              contradiction. The panel has its own labelled Close button and
-              traps focus, so the trigger is never the way back out. */}
-          <button
-            ref={triggerRef}
-            type="button"
-            onClick={() => setOpen(true)}
-            aria-haspopup="dialog"
-            aria-label="Open menu"
-            className="grid h-11 w-11 place-items-center rounded-lg text-fg-dim transition-colors hover:text-accent md:hidden"
-          >
-            <Menu />
-          </button>
+
+          <ul className="hidden items-center gap-5 text-[0.8125rem] lg:flex">
+            {sections.map((section) => (
+              <li key={section.id}>
+                <a
+                  href={`#${section.id}`}
+                  aria-current={active === section.id ? "location" : undefined}
+                  className={
+                    active === section.id
+                      ? "inline-flex min-h-11 items-center text-fg"
+                      : "inline-flex min-h-11 items-center text-fg-faint transition-colors hover:text-fg"
+                  }
+                >
+                  {section.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+
+          <div className="flex items-center gap-2">
+            <a
+              href={site.booking}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Book a meeting (opens in a new tab)"
+              className="nav-booking"
+            >
+              Book a meeting
+            </a>
+            <button
+              ref={triggerRef}
+              type="button"
+              onClick={() => setOpen(true)}
+              aria-haspopup="dialog"
+              aria-expanded={open}
+              aria-controls="mobile-site-menu"
+              aria-label="Open menu"
+              className="grid h-11 w-11 place-items-center rounded-md text-fg-dim transition-colors hover:text-fg lg:hidden"
+            >
+              <Menu />
+            </button>
+          </div>
         </div>
       </nav>
 
       {open ? (
         <div
+          id="mobile-site-menu"
           ref={panelRef}
           role="dialog"
           aria-modal="true"
           aria-label="Menu"
-          className="fixed inset-0 z-50 bg-bg md:hidden"
+          className="pointer-events-auto fixed inset-0 z-50 bg-bg lg:hidden"
         >
           <div className="shell flex h-[var(--nav-h)] items-center justify-between border-b border-line">
             <span className="display text-[0.95rem] tracking-tight">
               {site.firstName}
-              <span className="text-accent">.</span>
+              <span className="text-signal">.</span>
             </span>
             <button
               type="button"
               onClick={close}
               aria-label="Close menu"
-              className="grid h-11 w-11 place-items-center rounded-lg text-fg-dim transition-colors hover:text-accent"
+              className="grid h-11 w-11 place-items-center rounded-md text-fg-dim transition-colors hover:text-fg"
             >
               <Close />
             </button>
           </div>
 
-          <div className="shell flex flex-col gap-8 pt-10">
-            {/* py-2/py-3 below, not gap. The links are the touch targets and they
-                have to clear 44px on their own; the padding does that and the
-                gap shrinks to match, so the visual rhythm is unchanged. */}
+          <nav
+            aria-label="Mobile sections"
+            className="shell flex flex-col gap-8 pt-10"
+          >
             <ul className="flex flex-col gap-1">
-              {sections.map((s) => (
-                <li key={s.id}>
+              {sections.map((section) => (
+                <li key={section.id}>
                   <a
-                    href={`#${s.id}`}
+                    href={`#${section.id}`}
                     onClick={close}
-                    className="inline-block py-2 display text-[1.75rem] transition-colors hover:text-accent"
+                    aria-current={
+                      active === section.id ? "location" : undefined
+                    }
+                    className="display inline-block py-2 text-[1.75rem] transition-colors hover:text-accent"
                   >
-                    {s.label}
+                    {section.label}
                   </a>
                 </li>
               ))}
             </ul>
 
+            <a
+              href={site.booking}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Book a meeting (opens in a new tab)"
+              onClick={close}
+              className="flex items-center justify-center rounded-md bg-accent px-5 py-3 font-semibold text-bg transition-colors hover:bg-accent-bright"
+            >
+              Book a meeting
+            </a>
+
             <ul className="flex flex-col border-t border-line pt-6 text-[0.9375rem] text-fg-dim">
-              {links.map((l) => (
-                <li key={l.label}>
+              {mobileLinks.map((link) => (
+                <li key={link.label}>
                   <a
-                    href={l.href}
+                    href={link.href}
                     onClick={close}
+                    aria-label={
+                      link.external
+                        ? `${link.label} (opens in a new tab)`
+                        : undefined
+                    }
                     className="block py-3 transition-colors hover:text-accent"
-                    {...(l.external
+                    {...(link.external
                       ? { target: "_blank", rel: "noopener noreferrer" }
                       : {})}
                   >
-                    {l.label}
+                    {link.label}
                   </a>
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
         </div>
       ) : null}
     </header>

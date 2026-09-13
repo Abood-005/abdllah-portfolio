@@ -15,6 +15,10 @@ Abdllah's edits, 2026-09-12:
   - the two retail roles (Restaurante SUMAQ, Adonis) are cut
   - Projects keeps Barber's Touch only; the other three are cut
   - one page, hard limit
+  - every URL is a real clickable annotation (LINKS / Layout.add_links). The
+    portfolio, LinkedIn, GitHub, email, sparkwebdigital.ca and barberstouch.ca
+    were all printed as bare text before, which is invisible to anyone reading
+    the PDF on a screen.
 
 The phone number stays HERE and only here. It is deliberately absent from the
 website (see src/content/site.ts): a public page gets scraped, a downloaded PDF
@@ -158,6 +162,20 @@ CERTS = [
 
 LANGUAGES = u"English (Fluent, Native)  |  Arabic (Fluent, Native)"
 
+# Substring -> URL. The strings are printed bare (no "https://") because a CV
+# reads better that way, so every one of them needs a real link annotation
+# underneath or it is just grey text to anyone reading on a screen. Keyed by the
+# exact substring as it appears in the drawn line; add_link finds its offset with
+# the same font metrics used to draw it, so the hotspot lands on the glyphs.
+LINKS = {
+    "abdllahabbara.ca": "https://abdllahabbara.ca",
+    "linkedin.com/in/abdllah-abbara": "https://www.linkedin.com/in/abdllah-abbara/",
+    "github.com/Abood-005": "https://github.com/Abood-005",
+    "Abdllahabbara@icloud.com": "mailto:Abdllahabbara@icloud.com",
+    "sparkwebdigital.ca": "https://www.sparkwebdigital.ca/",
+    "barberstouch.ca": "https://barberstouch.ca",
+}
+
 
 def wrap(text, font, size, width):
     """Greedy word wrap against real glyph metrics."""
@@ -186,12 +204,38 @@ class Layout:
         self.c, self.s, self.draw = c, s, draw
         self.y = H - MT
 
+    def add_links(self, line, font, size, x_left, baseline):
+        """
+        Lay clickable hotspots over any LINKS substring inside an already-drawn
+        line. Offsets come from the same font metrics used to draw it, so the
+        rectangle sits on the glyphs rather than near them. thickness=0 keeps
+        the annotation invisible: the accent is the text itself, and a Acrobat
+        default border box around every URL looks like a 2004 Word export.
+        """
+        if not self.draw:
+            return
+        for sub, url in LINKS.items():
+            i = line.find(sub)
+            if i < 0:
+                continue
+            x0 = x_left + pdfmetrics.stringWidth(line[:i], font, size)
+            x1 = x0 + pdfmetrics.stringWidth(sub, font, size)
+            self.c.linkURL(
+                url,
+                (x0, baseline - 0.22 * size, x1, baseline + 0.82 * size),
+                relative=0,
+                thickness=0,
+            )
+
     def text(self, x, txt, font, size, lead):
         self.y -= size
+        baseline = self.y
         if self.draw:
             self.c.setFont(font, size)
-            self.c.drawString(x, self.y, txt)
+            self.c.drawString(x, baseline, txt)
+            self.add_links(txt, font, size, x, baseline)
         self.y -= (lead - size)
+        return baseline
 
     def para(self, txt, font, size, lead, x=ML):
         for ln in wrap(txt, font, size, W - MR - x):
@@ -234,11 +278,15 @@ class Layout:
         s = self.s
         size = s["body"]
         self.y -= size
+        baseline = self.y
         if self.draw:
             self.c.setFont(B, size)
-            self.c.drawString(ML, self.y, left)
+            self.c.drawString(ML, baseline, left)
             self.c.setFont(R, size)
-            self.c.drawRightString(W - MR, self.y, right)
+            self.c.drawRightString(W - MR, baseline, right)
+            # right-aligned, so its left edge is the margin minus its own width
+            rx = W - MR - pdfmetrics.stringWidth(right, R, size)
+            self.add_links(right, R, size, rx, baseline)
         self.y -= (s["lead"] - size)
 
     def labelled(self, label, rest):
@@ -267,9 +315,13 @@ class Layout:
         self.y -= s["name_after"]
         for ln in CONTACT:
             self.y -= s["contact"]
+            baseline = self.y
             if self.draw:
                 c.setFont(R, s["contact"])
-                c.drawCentredString(W / 2.0, self.y, ln)
+                c.drawCentredString(W / 2.0, baseline, ln)
+                # centred, so its left edge is half its width either side of centre
+                lx = W / 2.0 - pdfmetrics.stringWidth(ln, R, s["contact"]) / 2.0
+                self.add_links(ln, R, s["contact"], lx, baseline)
             self.y -= (s["contact_lead"] - s["contact"])
 
         self.heading("PROFESSIONAL SUMMARY")

@@ -1,23 +1,22 @@
 /**
- * Skills and certifications. Source: docs/resume.md § Technical skills and
- * § Certifications.
- *
- * The five groups are the CV's own categories, in the CV's own order. Do not
- * re-bucket them into invented headings, and do not drop the "(fundamentals)"
- * qualifiers on AWS and Azure — overstating that depth is exactly what a
- * technical interviewer will probe.
+ * Interview-facing capabilities and certifications. Every item comes from the
+ * résumé; the four groupings organize the same facts around the work a
+ * technical interviewer is likely to discuss. The fundamentals qualifiers on
+ * AWS and Azure remain explicit.
  */
 
-export type SkillGroup = {
+export type Capability = {
   readonly slug: string;
   readonly title: string;
+  readonly summary: string;
   readonly items: readonly string[];
 };
 
-export const skills: readonly SkillGroup[] = [
+export const capabilities: readonly Capability[] = [
   {
-    slug: "languages",
-    title: "Languages & Frameworks",
+    slug: "building",
+    title: "Building",
+    summary: "Application interfaces, backend logic, APIs, and automation.",
     items: [
       "JavaScript (ES6+)",
       "React",
@@ -26,49 +25,46 @@ export const skills: readonly SkillGroup[] = [
       "HTML5",
       "CSS3",
       "C#",
-      "SQL",
-      "T-SQL",
-      "Bash",
+      "REST APIs",
+      "Responsive design",
     ],
   },
   {
-    slug: "databases",
-    title: "Databases",
+    slug: "data",
+    title: "Data",
+    summary: "Operational databases, SQL, and relational modelling.",
     items: [
       "MongoDB",
       "Supabase (PostgreSQL)",
+      "SQL",
+      "T-SQL",
       "Relational design (ER diagrams)",
       "Normalization to 3NF",
     ],
   },
   {
-    slug: "cloud",
-    title: "Cloud & DevOps",
+    slug: "infrastructure",
+    title: "Infrastructure",
+    summary: "Cloud fundamentals and production web configuration.",
     items: [
       "AWS (fundamentals)",
       "Azure (fundamentals)",
-      "GitHub Actions CI/CD",
-      "Git",
       "Linux CLI",
-    ],
-  },
-  {
-    slug: "web",
-    title: "Web & APIs",
-    items: [
-      "REST APIs",
+      "Bash",
       "DNS & domain management",
       "SSL certificates",
-      "Responsive design",
       "Hosting and deployment",
     ],
   },
   {
-    slug: "tools",
-    title: "Tools & Platforms",
+    slug: "delivery",
+    title: "Delivery",
+    summary: "Version control, CI/CD, deployment, and team tooling.",
     items: [
-      "VS Code",
+      "Git",
       "GitHub",
+      "GitHub Actions CI/CD",
+      "VS Code",
       "Google Workspace",
       "Microsoft 365",
       "Remote access tools",
@@ -87,13 +83,13 @@ export type Certification = {
   readonly status: CertificationStatus;
   /**
    * Certificate URL. Each of the three MongoDB certificates is a PDF in
-   * public/, behind the card's View and Download buttons. Without an href
-   * the card renders no buttons.
+   * public/, behind the archive row's View and Download buttons. Without an
+   * href the row renders no buttons.
    */
   readonly href?: string;
   /**
    * Page one of `href`, rendered to WebP at public/certificates/<slug>.webp.
-   * A static export cannot embed a PDF viewer, so the card shows the picture
+   * A static export cannot embed a PDF viewer, so the row shows the picture
    * and the buttons hand over the document itself. Regenerate with pymupdf at
    * 1000px wide if a certificate is ever replaced; never point this at a PDF.
    */
